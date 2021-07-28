@@ -184,7 +184,7 @@ export class MonthSelect extends DateSelect {
         }
 
         monthArray.forEach((index) => {
-            monthStringArray.push(localeArray[index].substring(0, 3));
+            monthStringArray.push(localeArray[index]);
         });
 
         return monthStringArray;
