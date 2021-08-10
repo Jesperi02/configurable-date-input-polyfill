@@ -67,19 +67,19 @@ class Input {
         const inputObject = input;
         inputObject.setAttribute('data-has-picker', '');
 
-        const locale = inputObject.getAttribute('lang')
+        let locale = inputObject.getAttribute('lang')
             || document.body.getAttribute('lang')
             || 'en';
 
-        const dateFormat = inputObject.getAttribute('date-format')
+        let dateFormat = inputObject.getAttribute('date-format')
             || document.body.getAttribute('date-format')
             || inputObject.getAttribute('data-date-format')
             || document.body.getAttribute('data-date-format')
             || 'yyyy-mm-dd';
 
-        const minAttribute = inputObject.getAttribute('min')
+        let minAttribute = inputObject.getAttribute('min')
             || inputObject.getAttribute('data-min');
-        const maxAttribute = inputObject.getAttribute('max')
+        let maxAttribute = inputObject.getAttribute('max')
             || inputObject.getAttribute('data-max');
 
         inputObject.firstDayOfWeek = inputObject.getAttribute('data-first-day')
@@ -126,6 +126,17 @@ class Input {
                     },
                     set: (val) => {
                         inputObject.value = DateFormat(val, dateFormat);
+                        // trigger change event to execute event listeners on the date element
+                        let event;
+                        // IE event support check
+                        if (typeof (Event) === 'function') {
+                            event = new Event('change', { bubbles: true });
+                        } else {
+                            event = document.createEvent('Event');
+                            event.initEvent('change', true, true);
+                        }
+
+                        inputObject.dispatchEvent(event);
                     },
                 },
                 valueAsNumber: {
@@ -142,6 +153,37 @@ class Input {
                 },
             },
         );
+
+        // watch for element attribute changes
+        if ("MutationObserver" in window) {
+            const mutationObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName.indexOf('min') !== -1 || mutation.attributeName.indexOf('max') !== -1) {
+                        minAttribute = inputObject.getAttribute('min')
+                            || inputObject.getAttribute('data-min');
+                        maxAttribute = inputObject.getAttribute('max')
+                            || inputObject.getAttribute('data-max');
+                        inputObject.dateRange = this.getDateRange(minAttribute, maxAttribute);
+                    } else if (mutation.attributeName === 'lang') {
+                        locale = inputObject.getAttribute(mutation.attributeName);
+                        inputObject.localeLabels = this.getLocaleLabels(locale);
+                    } else if (mutation.attributeName === 'data-first-day') {
+                        inputObject.firstDayOfWeek = inputObject
+                                .getAttribute(mutation.attributeName);
+                    } else if (mutation.attributeName === 'data-date-format' || mutation.attributeName === 'date-format') {
+                        const date = inputObject.valueAsDate;
+                        dateFormat = inputObject.getAttribute(mutation.attributeName);
+                        if (date) {
+                            inputObject.valueAsDate = date; // reset date to update the format
+                        }
+                    }
+                });
+            });
+
+            mutationObserver.observe(inputObject, {
+                attributes: true,
+            });
+        }
 
         // Open the picker when the input get focus,
         // also on various click events to capture it in all corner cases.
