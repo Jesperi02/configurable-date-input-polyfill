@@ -112,7 +112,8 @@ date-input-polyfill {
             border: solid 1px $currentday-color;
             background-color: $currentday-color;
             &.disabled {
-              border: solid 1px $white-color;
+              border: solid 1px $currentday-color;
+              background-color: $currentday-color;
             }
           }
 
