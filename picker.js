@@ -90,7 +90,7 @@ class Picker {
             if (currentSelected) {
                 currentSelected.removeAttribute('data-selected');
             }
-            targetDay.setAttribute('data-selected', '');
+            targetDay.setAttribute('data-selected', '1');
 
             // Checks for next or prev month
             let jumpMonth = false;
@@ -356,7 +356,14 @@ class Picker {
         }
 
         // The input's current date.
-        const selDate = this.input.valueAsDate || false;
+        let selDate = this.input.valueAsDate;
+        if (!selDate) {
+            const parts = this.input.value.split('.');
+            selDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            if (isNaN(selDate.getTime())) {
+                selDate = false;
+            }
+        }
 
         // Are we in the input's currently-selected month and year?
         const selMatrix = selDate
@@ -402,8 +409,10 @@ class Picker {
                 // check if current item is current day
                 if (lookingAtCurrentMonth && today.getDate() === dayNum) {
                     // highlight the current day
-                    matrixHTML.push(`<td data-day ${selected ? `data-selected` : ``} class='current-day
-                        ${calculatedCurrentDate < minDate || calculatedCurrentDate > maxDate ? `disabled` : ``}'>${dayNum}</td>`);
+                    const selectedDayTile = `<td data-day ${selected ? `data-selected` : ``} class='current-day
+                    ${calculatedCurrentDate < minDate || calculatedCurrentDate > maxDate ? `disabled` : ``}'>${dayNum}</td>`;
+
+                    matrixHTML.push(selectedDayTile);
                 } else {
                     // display normal
                     const dayTile = `<td data-day ${selected ? `data-selected` : ``} 
