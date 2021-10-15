@@ -356,14 +356,7 @@ class Picker {
         }
 
         // The input's current date.
-        let selDate = this.input.valueAsDate;
-        if (!selDate) {
-            const parts = this.input.value.split('.');
-            selDate = new Date(parts[2], parts[1] - 1, parts[0]);
-            if (isNaN(selDate.getTime())) {
-                selDate = false;
-            }
-        }
+        const selDate = this.input.valueAsDate || false;
 
         // Are we in the input's currently-selected month and year?
         const selMatrix = selDate
@@ -410,7 +403,7 @@ class Picker {
                 if (lookingAtCurrentMonth && today.getDate() === dayNum) {
                     // highlight the current day
                     const selectedDayTile = `<td data-day ${selected ? `data-selected` : ``} class='current-day
-                    ${calculatedCurrentDate < minDate || calculatedCurrentDate > maxDate ? `disabled` : ``}'>${dayNum}</td>`;
+                        ${calculatedCurrentDate < minDate || calculatedCurrentDate > maxDate ? `disabled` : ``}'>${dayNum}</td>`;
 
                     matrixHTML.push(selectedDayTile);
                 } else {
