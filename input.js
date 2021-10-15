@@ -109,7 +109,6 @@ class Input {
 
                         // create absolute date of given input
                         const valueAsDate = new Date(year, month - 1, day, 0, 0, 0, 0);
-                        console.log("🚀 ~ file: input.js ~ line 129 ~ Input ~ prepareInputForPicker ~ valueAsDate", valueAsDate);
 
                         // return null in case of invalid date
                         if (isNaN(valueAsDate)) {
